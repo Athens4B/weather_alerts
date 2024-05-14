@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Alerts</title>
+</head>
+<body>
+    <h1>Weather Alerts</h1>
+    <ul id="alertList"></ul>
+
+    <script>
+        // Function to fetch data from the API and extract required fields
+        function fetchWeatherAlerts() {
+            var apiUrl = "https://api.weather.gov/alerts?active=true&status=actual&message_type=alert&code=TOR,SVR&region_type=land&urgency=Immediate,Expected,Future,Past&severity=Extreme,Severe,Moderate&certainty=Observed,Likely,Possible&limit=500";
+            
+            fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                var alerts = data.features;
+                var alertList = document.getElementById("alertList");
+                // Clear existing alerts
+                alertList.innerHTML = "";
+                
+                alerts.forEach(alert => {
+                    var event = alert.properties.event;
+                    var headline = alert.properties.headline;
+                    var areaDesc = alert.properties.areaDesc;
+                    
+                    var listItem = document.createElement("li");
+                    listItem.innerHTML = "<strong>Event:</strong> " + event + "<br><strong>Headline:</strong> " + headline + "<br><strong>Area Description:</strong> " + areaDesc + "<br><br>";
+                    alertList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById("alertList").innerHTML = "An error occurred while fetching the data.";
+            });
+        }
+
+        // Call the function to fetch weather alerts initially
+        fetchWeatherAlerts();
+
+        // Set interval to update weather alerts every 10 seconds
+        setInterval(fetchWeatherAlerts, 10000);
+    </script>
+</body>
+</html>
